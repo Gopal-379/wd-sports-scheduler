@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const bodyParser = require("body-parser");
 var csrf = require("tiny-csrf");
 var cookieParser = require("cookie-parser");
 const path = require("path");
@@ -9,9 +10,9 @@ const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
 const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
-
 const saltRounds = 10;
 
+app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -33,9 +34,14 @@ passport.use(new LocalStrategy({
   usernameField: 'email',
   passportField: 'password'
 }, (username, password, done) => {
-  User.findOne({ where: { email: username, password: password } })
-    .then((user) => {
-    return done(null, user);
+  User.findOne({ where: { email: username } })
+    .then(async (user) => {
+      const res = await bcrypt.compare(password, user.password);
+      if (res) {
+        return done(null, user);
+      } else {
+        return done(null, false);
+      }
     }).catch((err) => {
       return (err);
   })
@@ -57,9 +63,21 @@ passport.deserializeUser((id, done) => {
 });
 
 app.get("/", (req, res) => {
-  res.render("index", {
+  if (req.user) {
+    return res.redirect("/sport");
+  } else {
+    res.render("index", {
+      title: "Sports Scheduler",
+      crsfToken: req.csrfToken(),
+    });
+  }
+});
+
+app.get("/sport", (req, res) => {
+  res.render("sport", {
     title: "Sports Scheduler",
   });
+  const userRole = "admin";
 });
 
 app.get("/createsport", (req, res) => {
@@ -84,11 +102,20 @@ app.get("/login", async (req, res) => {
   });
 });
 
+app.get("/signout", (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
+  })
+});
+
 app.post("/users", async (req, res) => {
   const hashedPwd = await bcrypt.hash(req.body.password, saltRounds);
-  const subval = req.body.submit;
+  const btn_val = req.body.submit;
   try {
-    if (subval === "admin") {
+    if (btn_val === "admin") {
       const admin = await User.create({
         firstname: req.body.firstName,
         lastname: req.body.lastName,
@@ -100,9 +127,9 @@ app.post("/users", async (req, res) => {
         if (err) {
           console.log(err);
         }
-        res.redirect("/sports");
+        res.redirect("/sport");
       });
-    } else if (subval === "player") {
+    } else if (btn_val === "player") {
       const player = await User.create({
         firstname: req.body.firstName,
         lastname: req.body.lastName,
@@ -114,7 +141,7 @@ app.post("/users", async (req, res) => {
         if (err) {
           console.log(err);
         }
-        res.redirect("/sports");
+        res.redirect("/sport");
       });
     }
   } catch (err) {
@@ -123,8 +150,13 @@ app.post("/users", async (req, res) => {
   }
 });
 
-app.post("/session", (req, res) => {
-  res.redirect("/sports");
+app.post("/session",
+  passport.authenticate("local", {
+    failureRedirect: "/login",
+    failureFlash: true,
+  }),
+  (req, res) => {
+  res.redirect("/sport");
 })
 
 module.exports = app;
