@@ -77,6 +77,13 @@ app.get("/signup", (req, res) => {
   });
 });
 
+app.get("/login", async (req, res) => {
+  res.render("login", {
+    title: "Login",
+    csrfToken: req.csrfToken(),
+  });
+});
+
 app.post("/users", async (req, res) => {
   const hashedPwd = await bcrypt.hash(req.body.password, saltRounds);
   const subval = req.body.submit;
@@ -115,5 +122,9 @@ app.post("/users", async (req, res) => {
     return response.redirect("/signup");
   }
 });
+
+app.post("/session", (req, res) => {
+  res.redirect("/sports");
+})
 
 module.exports = app;
