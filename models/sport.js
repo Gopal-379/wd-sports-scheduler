@@ -17,12 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     static getSport(userId) {
-      return this.findAll({
-        where: {
-          userId,
-        },
-        order: [["id", "ASC"]],
-      });
+      return this.findAll();
     }
 
     static createsports({ sportName, userId }) {

@@ -86,12 +86,14 @@ app.get("/sport", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
     const loggedInUser = req.user.id;
     const user = await User.findByPk(loggedInUser);
     const userName = user.dataValues.firstname;
+    const uid = user.dataValues.id;
     const sports = await Sport.getSport(loggedInUser);
     const role = user.dataValues.role;
     if (req.accepts("html")) {
       res.render("sport", {
         title: "Sports Details",
         userName,
+        uid,
         sports,
         role,
         csrfToken: req.csrfToken(),

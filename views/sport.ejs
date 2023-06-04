@@ -20,14 +20,42 @@
                     <div class="my-4">
                         <a href="/signout" class="text-blue-500 hover:underline">Signout</a>
                     </div>
-                    <div class="my-4">
-                        <a href="/createsport" class="text-blue-500 hover:underline">Create Sport</a>
-                    </div>
-                    <div class="my-4">
-                        <a href="#" class="text-blue-500 hover:underline">View Reports</a>
+                    <div class="my-4 space-x-6">
+                        <a href="/createsport" class="text-white bg-blue-500 hover:bg-blue-600 rounded px-5 py-2">Create Sport</a>
+                        <a href="#" class="text-white bg-blue-500 hover:bg-blue-600 rounded px-5 py-2">View Reports</a>
                     </div>
                     <div>
-                        <h2 class="font-semibold">Created Sports:</h2>
+                        <h5 class="font-semibold text-2xl">Created Sports:</h5>
+                    </div>
+                    <div>
+                        <div>
+                            <h6 class="text-red-800 text-2xl">
+                                <%= (sports.length == 0)?"Sports sessions are not yet created":"" %>
+                            </h6>
+                        </div>
+                        <ul class="list-none">
+                            <% for (let i=0;i<sports.length;i++) { %>
+                                <% if (sports[i].userId == uid) { %>
+                                    <p class="text-black-600 text-xl mt-2">Created By You</p>
+                                    <li>
+                                        <div class="text-gray-600">
+                                            <a href="/sport/<%= sports[i].id %>">
+                                                <h4 class="hover:underline"><%= sports[i].sportName %></h4>
+                                            </a> 
+                                        </div>
+                                    </li>
+                                <% } else { %>
+                                    <p class="text-black-600 text-xl mt-2">Created By other admin</p>
+                                    <li>
+                                        <div class="text-gray-600">
+                                            <a href="/sport/<%= sports[i].id %>">
+                                                <h4 class="hover:underline"><%= sports[i].sportName %></h4>
+                                            </a> 
+                                        </div>
+                                    </li>
+                                <% } %>
+                            <% } %>
+                        </ul>
                     </div>
                 <% } else { %>
                     <p class="text-2xl flex items-center">Welcome <%= userName %></p>
@@ -35,10 +63,28 @@
                         <a href="/signout" class="text-blue-500 hover:underline">Signout</a>
                     </div>
                     <div class="my-4">
-                        <a href="#" class="text-blue-500 hover:underline">View Reports</a>
+                        <a href="#" class="text-white bg-blue-500 hover:bg-blue-600 rounded px-5 py-2">View Reports</a>
                     </div>
                     <div>
-                        <h2 class="font-semibold">Created Sports:</h2>
+                        <h5 class="font-semibold text-2xl">Created Sports:</h5>
+                    </div>
+                    <div>
+                        <div>
+                            <h6 class="text-red-800 text-2xl">
+                                <%= (sports.length == 0)?"Sports sessions are not yet created":"" %>
+                            </h6>
+                        </div>
+                        <ul class="list-none">
+                            <% for (let i=0;i<sports.length;i++) { %>
+                                <li>
+                                    <div class="text-gray-600">
+                                        <a href="/sport/<%= sports[i].id %>">
+                                            <h4 class="hover:underline"><%= sports[i].sportName %></h4>
+                                        </a> 
+                                    </div>
+                                </li>
+                            <% } %>
+                        </ul>
                     </div>
                 <% } %> 
             </div> 
