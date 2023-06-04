@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 var csrf = require("tiny-csrf");
 var cookieParser = require("cookie-parser");
 const path = require("path");
-const { User } = require("./models");
+const { User, Sport } = require("./models");
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
@@ -20,32 +20,40 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser("Shh! Some Secret String"));
 app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELTE"]));
 
-app.use(session({
-  secret: "my-super-secret-key-24386981602896017092640982168",
-  cookie: {
-    maxAge: 24 * 60 * 60 * 1000,
-  }
-}));
+app.use(
+  session({
+    secret: "my-super-secret-key-24386981602896017092640982168",
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000,
+    },
+  })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new LocalStrategy({
-  usernameField: 'email',
-  passportField: 'password'
-}, (username, password, done) => {
-  User.findOne({ where: { email: username } })
-    .then(async (user) => {
-      const res = await bcrypt.compare(password, user.password);
-      if (res) {
-        return done(null, user);
-      } else {
-        return done(null, false);
-      }
-    }).catch((err) => {
-      return (err);
-  })
-}));
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "email",
+      passportField: "password",
+    },
+    (username, password, done) => {
+      User.findOne({ where: { email: username } })
+        .then(async (user) => {
+          const res = await bcrypt.compare(password, user.password);
+          if (res) {
+            return done(null, user);
+          } else {
+            return done(null, false);
+          }
+        })
+        .catch((err) => {
+          return err;
+        });
+    }
+  )
+);
 
 passport.serializeUser((user, done) => {
   console.log("Serializing user in session", user.id);
@@ -54,12 +62,12 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser((id, done) => {
   User.findByPk(id)
-    .then(user => {
+    .then((user) => {
       done(null, user);
     })
-    .catch(err => {
+    .catch((err) => {
       done(err, null);
-    })
+    });
 });
 
 app.get("/", (req, res) => {
@@ -80,13 +88,39 @@ app.get("/sport", (req, res) => {
   const userRole = "admin";
 });
 
-app.get("/createsport", (req, res) => {
-  console.log("Sport");
-});
+app.get(
+  "/createsport",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (req, res) => {
+    if (req.user.role === "admin") {
+      res.render("createsport", {
+        title: "Create sport",
+        csrfToken: req.csrfToken(),
+      });
+    }
+  }
+);
 
-app.post("/createsport", (req, res) => {
-  console.log("Creating Sport");
-});
+app.post(
+  "/createsport",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (req, res) => {
+    // console.log("Creating Sport");
+    if (req.user.role === "admin") {
+      try {
+        const sport = await Sport.createsports({
+          name: req.body.sportName,
+          userId: req.user.id,
+        });
+        return res.redirect("/sport");
+      } catch (e) {
+        console.log(e);
+      }
+    } else {
+      return res.redirect("/");
+    }
+  }
+);
 
 app.get("/signup", (req, res) => {
   res.render("signup", {
@@ -108,7 +142,7 @@ app.get("/signout", (req, res, next) => {
       return next(err);
     }
     res.redirect("/");
-  })
+  });
 });
 
 app.post("/users", async (req, res) => {
@@ -150,13 +184,15 @@ app.post("/users", async (req, res) => {
   }
 });
 
-app.post("/session",
+app.post(
+  "/session",
   passport.authenticate("local", {
     failureRedirect: "/login",
     failureFlash: true,
   }),
   (req, res) => {
-  res.redirect("/sport");
-})
+    res.redirect("/sport");
+  }
+);
 
 module.exports = app;

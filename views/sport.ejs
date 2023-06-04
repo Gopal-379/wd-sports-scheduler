@@ -8,12 +8,10 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <title><%= title %></title>
     </head>
-    <body class="bg-green-100">
+    <body class="bg-slate-300">
         <div class="grid grid-cols-4">
             <div class="col-start-2 col-span-2">
                 <%- include("header") %>
-                <% if (userRole === 'admin'){ %>
-                    <!-- <p class="text-2xl flex items-center">Welcome <%= playerName %></p> -->
                     <div class="my-4">
                         <a href="/signout" class="text-blue-500 hover:underline">Signout</a>
                     </div>
@@ -26,24 +24,7 @@
                     <div>
                         <h2 class="font-semibold">Created Sports:</h2>
                     </div>
-                    <!-- <div>
-                        <%- include("createdSportsList.ejs",{data:allSports}) %>
-                    </div> -->
-                <% } else { %>
-                    <!-- <p class="text-2xl flex items-center">Welcome <%= playerName %></p> -->
-                    <div class="my-4">
-                        <a href="/signout" class="text-blue-500 hover:underline">Signout</a>
-                    </div>
-                    <div class="my-4">
-                        <a href="#" class="text-blue-500 hover:underline">View Reports</a>
-                    </div>
-                    <div>
-                        <h2 class="font-semibold">Created Sports:</h2>
-                    </div>
-                    <!-- <div>
-                        <%- include("createdSportsList.ejs",{data:allSports}) %>
-                    </div> -->
-                <% } %>
+                    
             </div> 
         </div>
     </body>
