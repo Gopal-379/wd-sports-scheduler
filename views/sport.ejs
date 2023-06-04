@@ -12,6 +12,11 @@
         <div class="grid grid-cols-4">
             <div class="col-start-2 col-span-2">
                 <%- include("header") %>
+                <% if (role === "admin") { %>
+                    <p class="text-2xl flex items-center">Welcome <%= userName %></p>
+                    <div class="my-4">
+                        <h1 class="text-xl">Administrative Actions</h1>
+                    </div>
                     <div class="my-4">
                         <a href="/signout" class="text-blue-500 hover:underline">Signout</a>
                     </div>
@@ -24,7 +29,18 @@
                     <div>
                         <h2 class="font-semibold">Created Sports:</h2>
                     </div>
-                    
+                <% } else { %>
+                    <p class="text-2xl flex items-center">Welcome <%= userName %></p>
+                    <div class="my-4">
+                        <a href="/signout" class="text-blue-500 hover:underline">Signout</a>
+                    </div>
+                    <div class="my-4">
+                        <a href="#" class="text-blue-500 hover:underline">View Reports</a>
+                    </div>
+                    <div>
+                        <h2 class="font-semibold">Created Sports:</h2>
+                    </div>
+                <% } %> 
             </div> 
         </div>
     </body>

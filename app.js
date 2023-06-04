@@ -81,11 +81,27 @@ app.get("/", (req, res) => {
   }
 });
 
-app.get("/sport", (req, res) => {
-  res.render("sport", {
-    title: "Sports Scheduler",
-  });
-  const userRole = "admin";
+app.get("/sport", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
+  try {
+    const loggedInUser = req.user.id;
+    const user = await User.findByPk(loggedInUser);
+    const userName = user.dataValues.firstname;
+    const sports = await Sport.getSport(loggedInUser);
+    const role = user.dataValues.role;
+    if (req.accepts("html")) {
+      res.render("sport", {
+        title: "Sports Details",
+        userName,
+        sports,
+        role,
+        csrfToken: req.csrfToken(),
+      });
+    } else {
+      res.json({ sports });
+    }
+  } catch (e) {
+    console.log(e);
+  }
 });
 
 app.get(
@@ -109,9 +125,10 @@ app.post(
     if (req.user.role === "admin") {
       try {
         const sport = await Sport.createsports({
-          name: req.body.sportName,
+          sportName: req.body.sportName,
           userId: req.user.id,
-        });
+        }); 
+        // console.log(sport.sportName);
         return res.redirect("/sport");
       } catch (e) {
         console.log(e);
