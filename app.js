@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
@@ -14,6 +16,7 @@ const saltRounds = 10;
 
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
+// eslint-disable-next-line no-undef
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
@@ -199,7 +202,7 @@ app.post("/users", async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    return response.redirect("/signup");
+    return res.redirect("/signup");
   }
 });
 
