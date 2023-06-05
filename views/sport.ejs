@@ -13,9 +13,9 @@
             <div class="col-start-2 col-span-2">
                 <%- include("header") %>
                 <% if (role === "admin") { %>
-                    <p class="text-2xl flex items-center">Welcome <%= userName %></p>
+                    <p class="text-2xl flex justify-center mt-4">Welcome <%= userName %></p>
                     <div class="my-4">
-                        <h1 class="text-xl">Administrative Actions</h1>
+                        <h1 class="text-xl flex justify-center">Administrative Actions</h1>
                     </div>
                     <div class="my-4">
                         <a href="/signout" class="text-blue-500 hover:underline">Signout</a>
@@ -24,7 +24,7 @@
                         <a href="/createsport" class="text-white bg-blue-500 hover:bg-blue-600 rounded px-5 py-2">Create Sport</a>
                         <a href="#" class="text-white bg-blue-500 hover:bg-blue-600 rounded px-5 py-2">View Reports</a>
                     </div>
-                    <div>
+                    <div class="my-4">
                         <h5 class="font-semibold text-2xl">Created Sports:</h5>
                     </div>
                     <div>
@@ -44,7 +44,11 @@
                                             </a> 
                                         </div>
                                     </li>
-                                <% } else { %>
+                                <% } %>
+                            <% } %>
+                            <hr/>
+                            <% for (let i=0;i<sports.length;i++) { %>
+                                <% if (sports[i].userId != uid) { %>
                                     <p class="text-black-600 text-xl mt-2">Created By other admin</p>
                                     <li>
                                         <div class="text-gray-600">

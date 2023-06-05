@@ -4,7 +4,14 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon -e js,ejs",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint",
+      "prettier --write ."
+    ]
   },
   "author": "Gopal <gopalpeddi379@gmail.com>",
   "license": "ISC",
@@ -25,7 +32,11 @@
   "description": "",
   "devDependencies": {
     "cheerio": "^1.0.0-rc.12",
+    "eslint": "^8.42.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.2",
     "nodemon": "^2.0.22",
+    "prettier": "^2.8.8",
     "sequelize-cli": "^6.6.0"
   }
 }
