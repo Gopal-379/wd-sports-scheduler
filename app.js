@@ -12,16 +12,18 @@ const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
 const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
+const flash = require("connect-flash");
 const saltRounds = 10;
 
+// eslint-disable-next-line no-undef
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
-// eslint-disable-next-line no-undef
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser("Shh! Some Secret String"));
 app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELTE"]));
+app.use(flash());
 
 app.use(
   session({
@@ -48,15 +50,22 @@ passport.use(
           if (res) {
             return done(null, user);
           } else {
-            return done(null, false);
+            return done(null, false, { messages: "Invalid password!" });
           }
         })
         .catch((err) => {
-          return err;
+          return done(null, false, {
+            message: "Account does not exist, Please Sign Up",
+          });
         });
     }
   )
 );
+
+app.use(function (req, res, next) {
+  res.locals.messages = req.flash();
+  next();
+});
 
 passport.serializeUser((user, done) => {
   console.log("Serializing user in session", user.id);
@@ -132,7 +141,7 @@ app.post(
         const sport = await Sport.createsports({
           sportName: req.body.sportName,
           userId: req.user.id,
-        }); 
+        });
         // console.log(sport.sportName);
         return res.redirect("/sport");
       } catch (e) {
@@ -168,8 +177,24 @@ app.get("/signout", (req, res, next) => {
 });
 
 app.post("/users", async (req, res) => {
-  const hashedPwd = await bcrypt.hash(req.body.password, saltRounds);
+  if (req.body.email.length == 0) {
+    req.flash("error", "Email can't be empty!");
+    return res.redirect("/signup");
+  }
+  if (req.body.firstName.length == 0) {
+    req.flash("error", "Name can't be empty!");
+    return res.redirect("/signup");
+  }
+  if (req.body.lastName.length == 0) {
+    req.flash("error", "Name can't be empty!");
+    return res.redirect("/signup");
+  }
+  if (req.body.password.length < 8) {
+    req.flash("error", "Password is shorter than 8 characters!");
+    return res.redirect("/signup");
+  }
   const btn_val = req.body.submit;
+  const hashedPwd = await bcrypt.hash(req.body.password, saltRounds);
   try {
     if (btn_val === "admin") {
       const admin = await User.create({
@@ -202,6 +227,7 @@ app.post("/users", async (req, res) => {
     }
   } catch (err) {
     console.log(err);
+    req.flash("error", "This mail already exists! Please try again");
     return res.redirect("/signup");
   }
 });

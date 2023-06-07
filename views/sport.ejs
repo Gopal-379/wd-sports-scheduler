@@ -47,9 +47,9 @@
                                 <% } %>
                             <% } %>
                             <hr/>
+                            <p class="text-black-600 text-xl mt-2">Created By other admin</p>
                             <% for (let i=0;i<sports.length;i++) { %>
                                 <% if (sports[i].userId != uid) { %>
-                                    <p class="text-black-600 text-xl mt-2">Created By other admin</p>
                                     <li>
                                         <div class="text-gray-600">
                                             <a href="/sport/<%= sports[i].id %>">
@@ -70,7 +70,7 @@
                         <a href="#" class="text-white bg-blue-500 hover:bg-blue-600 rounded px-5 py-2">View Reports</a>
                     </div>
                     <div>
-                        <h5 class="font-semibold text-2xl">Created Sports:</h5>
+                        <h5 class="font-semibold text-2xl">Available Sports:</h5>
                     </div>
                     <div>
                         <div>
