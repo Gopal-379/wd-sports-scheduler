@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="copyright" content="©Peddi Gopal">
+        <meta name="csrf-token" content="<%= csrfToken %>">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="/css/styles.css">
+        <title><%= title %></title>
+    </head>
+    <body class="bg-slate-300">
+        <%- include('header') %>
+        <div class="flex justify-center items-center mt-4 mr-10 space-x-6">
+            <a href="/sport/<%= sport.id %>" class="text-blue-500 hover:underline">Go Back</a>
+            <a href="/signout" class="text-blue-500 hover:underline">Signout</a>
+        </div>
+        <div class="flex justify-center items-center h-screen">
+            <div class="w-100 p-8 bg-white rounded shadow">
+                <h1 class="text-4xl font-bold mb-8 text-gray-900">Create a new Session</h1>
+                <form action="/createsession/<%= sport.id %>" method="post">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <div class="mb-4">
+                        <label for="sessionName" class="text-gray-700">Session Name:</label>
+                        <input type="text" name="sessionName" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="date" class="text-gray-700">Enter Date:</label>
+                        <input type="date" name="date" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="time" class="text-gray-700">Enter Time:</label>
+                        <input type="time" name="time" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="venue" class="text-gray-700">Enter Venue:</label>
+                        <input type="text" name="venue" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="players" class="text-gray-700">Players joining the session:</label>
+                        <input type="text" name="players" placeholder="Seperate player names with comma" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="noplayers" class="text-gray-700">How many more players do you need?</label>
+                        <input type="number" name="noplayers" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
+                    </div>
+                    <div class="py-2">
+                        <button type="submit" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded px-5 py-2">Submit</button>
+                    </div>
+                </form>
+                <div class="py-2">
+                    <% if(messages && messages.error && messages.error.length>0){ %>
+                        <% for(var i=0; i<messages.error.length; i++) { %>
+                            <li class=" py-2 px-2 border bg-red-200 rounded"> 
+                                <%= messages.error[i] %>
+                            </li>
+                        <%} %>
+                    <%}%>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

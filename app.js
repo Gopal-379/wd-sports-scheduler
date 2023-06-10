@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 var csrf = require("tiny-csrf");
 var cookieParser = require("cookie-parser");
 const path = require("path");
-const { User, Sport } = require("./models");
+const { User, Sport, Session } = require("./models");
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
@@ -149,6 +149,44 @@ app.post(
       }
     } else {
       return res.redirect("/");
+    }
+  }
+);
+
+app.get("/sport/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
+  const sport = await Sport.findByPk(req.params.id);
+  const role = req.user.role;
+  if (req.accepts("html")) {
+    try {
+      res.render("sportSession", {
+        title: sport.sportName,
+        sport,
+        role,
+        csrfToken: req.csrfToken(),
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  } else {
+    res.json({
+      sport,
+    });
+  }
+});
+
+app.get(
+  "/sport/session/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (req, res) => {
+    const sport = await Sport.findByPk(req.params.id);
+    try {
+      res.render("createsession", {
+        title: sport.sportName,
+        sport,
+        csrfToken: req.csrfToken(),
+      });
+    } catch (err) {
+      console.log(err);
     }
   }
 );

@@ -14,9 +14,13 @@ module.exports = (sequelize, DataTypes) => {
       Sport.belongsTo(models.User, {
         foreignKey: "userId",
       });
+      Sport.hasMany(models.Session, {
+        foreignKey: "sportId",
+      });
+      
     }
 
-    static getSport(userId) {
+    static getSport() {
       return this.findAll();
     }
 
