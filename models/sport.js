@@ -17,7 +17,6 @@ module.exports = (sequelize, DataTypes) => {
       Sport.hasMany(models.Session, {
         foreignKey: "sportId",
       });
-      
     }
 
     static getSport() {
@@ -32,16 +31,19 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     static editSport({ sportName, id }) {
-      return this.update({
-        sportName,
-      }, {
-        where: {
-          id,
+      return this.update(
+        {
+          sportName,
         },
-      });
+        {
+          where: {
+            id,
+          },
+        }
+      );
     }
 
-    static deleteSport(id) {
+    static deleteSportById(id) {
       return this.destroy({
         where: {
           id,

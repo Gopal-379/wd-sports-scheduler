@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 var csrf = require("tiny-csrf");
 var cookieParser = require("cookie-parser");
 const path = require("path");
-const { User, Sport, Session } = require("./models");
+const { User, Sport, Session, participantSession } = require("./models");
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
@@ -99,7 +99,16 @@ app.get("/sport", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
     const user = await User.findByPk(loggedInUser);
     const userName = user.dataValues.firstname;
     const uid = user.dataValues.id;
-    const sports = await Sport.getSport(loggedInUser);
+    const sports = await Sport.getSport();
+    const playersessions = await participantSession.getSessionByPlayerId(
+      req.user.id
+    );
+    //console.log(playersessions);
+    const sessId = playersessions.map((v) => v.sessionId);
+    //console.log(sessId);
+    const allsessions = await Session.findSessionById(sessId);
+    //console.log(allsessions);
+    const upComing = await Session.filterUpcomingSessions(allsessions);
     const role = user.dataValues.role;
     if (req.accepts("html")) {
       res.render("sport", {
@@ -107,11 +116,12 @@ app.get("/sport", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
         userName,
         uid,
         sports,
+        upComing,
         role,
         csrfToken: req.csrfToken(),
       });
     } else {
-      res.json({ sports });
+      res.json({ sports, upComing });
     }
   } catch (e) {
     console.log(e);
@@ -156,11 +166,18 @@ app.post(
 app.get("/sport/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
   const sport = await Sport.findByPk(req.params.id);
   const role = req.user.role;
+  const allSessions = await Session.findSportById(req.params.id);
+  let upComing = await Session.filterUpcomingSessions(allSessions);
+  upComing = await Session.getUncancelledSessionsFilteredByCancellationStatus(
+    upComing
+  );
+  //console.log(upComing);
   if (req.accepts("html")) {
     try {
       res.render("sportSession", {
         title: sport.sportName,
         sport,
+        upComing,
         role,
         csrfToken: req.csrfToken(),
       });
@@ -170,9 +187,28 @@ app.get("/sport/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
   } else {
     res.json({
       sport,
+      upComing,
     });
   }
 });
+
+app.delete(
+  "/sport/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (req, res) => {
+    try {
+      const sess = await Session.findSportById(req.params.id);
+      const sessId = sess.map((v) => v.id);
+      await participantSession.deleteSession(sessId);
+      await Session.deleteSession(req.params.id);
+      await Sport.deleteSportById(req.params.id);
+      return res.json({ success: true });
+    } catch (err) {
+      console.log(err);
+      return res.status(422).json(err);
+    }
+  }
+);
 
 app.get(
   "/sport/session/:id",
@@ -187,6 +223,45 @@ app.get(
       });
     } catch (err) {
       console.log(err);
+    }
+  }
+);
+
+app.post(
+  "/createsession/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (req, res) => {
+    if (req.body.playerNums < 0) {
+      req.flash("error", "There can't be less than zero players");
+      return res.redirect(`/sport/session/${req.params.id}`);
+    }
+    try {
+      const sess = await Session.createSession({
+        sessionName: req.body.sessionName,
+        date: req.body.date,
+        time: req.body.time,
+        venue: req.body.venue,
+        playerNums: req.body.noplayers,
+        userId: req.user.id,
+        sportId: req.params.id,
+      });
+      const players = await req.body.players;
+      const arr = players.split(",");
+      await participantSession.create({
+        participants: req.user.firstname,
+        playerId: req.user.id,
+        sessionId: sess.id,
+      });
+      for (let i = 0; i < arr.length; i++) {
+        await participantSession.create({
+          participants: arr[i],
+          sessionId: sess.id,
+        });
+      }
+      return res.redirect(`/sport/${req.params.id}`);
+    } catch (e) {
+      console.log(e);
+      return res.status(422).json(e);
     }
   }
 );

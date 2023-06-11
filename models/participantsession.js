@@ -18,6 +18,23 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "sessionId",
       });
     }
+
+    static getSessionByPlayerId(playerId) {
+      return this.findAll({
+        where: {
+          playerId,
+        }
+      });
+    }
+
+    static async deleteSession(sessionId) {
+      return this.destroy({
+        where: {
+          sessionId,
+        }
+      });
+    }
+
   }
   participantSession.init({
     participants: DataTypes.STRING

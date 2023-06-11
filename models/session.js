@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model, Op } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Session extends Model {
     /**
@@ -21,18 +19,85 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "sessionId",
       });
     }
+    static createSession({
+      sessionName,
+      date,
+      time,
+      venue,
+      playerNums,
+      userId,
+      sportId,
+    }) {
+      return this.create({
+        sessionName,
+        date,
+        time,
+        venue,
+        playerNums,
+        userId,
+        sportId,
+      });
+    }
+    static findPlayerSessionsById(userId, sportId) {
+      return this.findAll({
+        where: {
+          userId,
+          sportId,
+        },
+      });
+    }
+
+    static async findSportById(sportId) {
+      return this.findAll({
+        where: {
+          sportId,
+        },
+      });
+    }
+
+    static async findSessionById(sessId) {
+      return this.findAll({
+        where: {
+          id: sessId,
+        }
+      });
+    }
+
+    static async filterUpcomingSessions(sportSessions) {
+      const curr = new Date();
+      const upComing = sportSessions.filter(
+        (s) => new Date(`${s.date} ${s.time}`) >= curr
+      );
+      return upComing;
+    }
+
+    static async getUncancelledSessionsFilteredByCancellationStatus(sessions) {
+      return sessions.filter((s) => s.sessionCancelled === null);
+    }
+
+    static async deleteSession(sportId) {
+      return this.destroy({
+        where: {
+          sportId,
+        }
+      });
+    }
+
   }
-  Session.init({
-    date: DataTypes.DATEONLY,
-    time: DataTypes.TIME,
-    venue: DataTypes.STRING,
-    playerNums: DataTypes.INTEGER,
-    sessionName: DataTypes.STRING,
-    sessionCancelled: DataTypes.BOOLEAN,
-    reason: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'Session',
-  });
+  Session.init(
+    {
+      date: DataTypes.DATEONLY,
+      time: DataTypes.TIME,
+      venue: DataTypes.STRING,
+      playerNums: DataTypes.INTEGER,
+      sessionName: DataTypes.STRING,
+      sessionCancelled: DataTypes.BOOLEAN,
+      reason: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: "Session",
+    }
+  );
   return Session;
 };

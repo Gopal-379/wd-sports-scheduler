@@ -9,40 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/css/styles.css">
     <title><%= title %></title>
-</head>
-<body class="bg-slate-300">
-    <div class="grid grid-cols-6">
-        <div class="col-start-2 col-span-4">
-            <%- include('header') %>
-            <div class="mt-4 space-x-6">
-                <a href="/sport" class="text-blue-500 hover:underline">
-                    Go Back
-                </a>
-                <a href="/signout" class="text-blue-500 hover:underline">
-                    Signout
-                </a>
-            </div>
-            <div class="mt-3">
-                <h1 class="text-4xl mb-4">
-                    <%= title %>
-                </h1>
-                <% if (role === "admin") { %>
-                    <div class="mt-4 space-x-6">
-                        <a href="#" class="text-blue-600 hover:underline">
-                            Edit
-                        </a>
-                        <a href="#" class="text-blue-600 hover:underline" onClick="deleteSport(<%= sport.id %>)">
-                            Delete
-                        </a>
-                    </div>
-                <% } %>
-            </div>
-            <div class="mt-2">
-                <a href="session/<%= sport.id %>" class="text-sky-600 hover:underline">Create a new session</a><br>
-                <a href="#" class="text-sky-600 hover:underline">View Previous Sessions</a>
-            </div>
-        </div>
-    </div>
+    
     <script>
         var token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
         function deleteSport(id) {
@@ -63,5 +30,49 @@
             .catch((e) => console.log(e));
         }
     </script>
+</head>
+<body class="bg-slate-300">
+    <div class="grid grid-cols-6">
+        <div class="col-start-2 col-span-4">
+            <%- include('header') %>
+            <div class="mt-4 space-x-6">
+                <a href="/sport" class="text-blue-500 hover:underline">Go Back</a>
+                <a href="/signout" class="text-blue-500 hover:underline">Signout</a>
+            </div>
+            <div class="mt-3">
+                <h1 class="text-4xl mb-4"><%= title %></h1>
+                <% if (role === "admin") { %>
+                    <div class="mt-4 space-x-6">
+                        <a href="#" class="text-blue-600 hover:underline">EditSport</a>
+                        <a href="#" class="text-blue-600 hover:underline" onclick="deleteSport(<%= sport.id %>)">DeleteSport</a>
+                    </div>
+                <% } %>
+            </div>
+            <h1 class="text-4xl mb-4 mt-3">Upcoming Sessions</h1>
+            <div class="flex flex-wrap justify-center">
+                <% if (upComing.length!==0) { %>
+                    <% for (var i=0;i< upComing.length;i++) { %>
+                        <div class="bg-white rounded shadow-lg p-4 m-4">
+                            <a href="#" class="text-blue-500 font-medium">
+                                <p class="text-lg mb-2"><%=(new Date(upComing[i].date)).toDateString() %></p>
+                                <p class="text-gray-600"><%= upComing[i].time %></p>
+                                <% if (upComing[i].playerNums === 0) { %>
+                                    <p class="text-red-500 mt-2">Fully Booked</p>
+                                <% } else { %>
+                                    <p class="text-green-500 mt-2"><%= upComing[i].playerNums %> slots available</p>
+                                <% } %>
+                            </a>
+                        </div>
+                    <% } %>
+                <% } else { %>
+                    <p class="text-lg mb-2">There are no Upcoming Sessions!</p>
+                <% } %>
+            </div>
+            <div class="mt-2">
+                <a href="session/<%= sport.id %>" class="text-sky-600 hover:underline">Create a new session</a><br>
+                <a href="#" class="text-sky-600 hover:underline">View Previous Sessions</a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

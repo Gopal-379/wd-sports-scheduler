@@ -22,7 +22,7 @@
                 <form action="/createsession/<%= sport.id %>" method="post">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <div class="mb-4">
-                        <label for="sessionName" class="text-gray-700">Session Name:</label>
+                        <label for="sessionName" class="text-gray-700">Session Name(<%= title %>):</label>
                         <input type="text" name="sessionName" class="border border-gray-300 text-gray-900 rounded p-2 w-full" required>
                     </div>
                     <div class="mb-4">
