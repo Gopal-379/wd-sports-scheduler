@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="copyright" content="©Peddi Gopal">
+    <meta name="csrf-token" content="<%= csrfToken %>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title><%= title %></title>
+    <script>
+        var token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+        function deletePlayerwithID(id) {
+            fetch (`/playersession/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "_csrf": token,
+                })
+            })
+            .then((res) => {
+                if (res.ok) {
+                    window.location.reload();
+                }
+            })
+            .catch((e) => console.log(e));
+        }
+
+        function joinSession(id) {
+            fetch(`/playersession/participant/${id}`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    "_csrf": token,
+                })
+            })
+            .then((res) => {
+                if (res.ok) {
+                    window.location.reload();
+                }
+            })
+            .catch((e) => console.log(e));
+        }
+
+        function leaveSession(id) {
+            fetch(`/playersession/participant/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    "_csrf": token,
+                })
+            })
+            .then((res)=> {
+                if (res.ok) {
+                    window.location.reload();
+                }
+            })
+            .catch((e) => console.log(e));
+        }
+    </script>
+</head>
+<body class="bg-slate-300">
+    <div class="grid grid-cols-6">
+        <div class="col-start-2 col-span-4">
+            <%- include('header') %>
+            <div class="mt-4 space-x-6">
+                <a href="/sport" class="text-blue-500 hover:underline">Go Back</a>
+                <a href="/signout" class="text-blue-500 hover:underline">Signout</a>
+            </div>
+            <div class="mt-3">
+                <h1 class="text-3xl font-bold"><%= title %></h1>
+            </div>
+            <div class="mt-2">
+                <p class="text-lg">This session is on <%= (new Date(sess.date)).toDateString() %>-<%= sess.time %>, and will take place at <%= sess.venue %>.</p>
+            </div>
+            <div class="mt-3">
+                <h2 class="text-2xl font-bold">Participants</h2>
+            </div>
+            <div class="flex flex-wrap mt-2">
+                <% for (var i=0; i< players.length; i++) { %>
+                    <div class="bg-white rounded p-2 m-2 flex items-center">
+                        <p class="mr-2">
+                            <%=(i+1)%>.<% if (players[i].playerId === userId) { %>
+                                You
+                            <% } else { %>
+                                <%= players[i].participants %>
+                            <% } %>
+                        </p>
+                        <% if (players[i].playerId === sess.userId) { %>
+                            <p class="text-gray-500">Organizer</p>
+                        <% } %>
+                        <%if (sess.userId === userId) { %>
+                            <a href="#" onclick="deletePlayerwithID(<%= players[i].id %>)" class="ml-2 text-red-500 hover:text-red-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </a>
+                        <% } %>
+                    </div>
+                <% } %>
+            </div>
+            <div class="mt-3">
+                <% if (players.some(players => players.playerId === userId)) { %>
+                    <a href="#" onclick="leaveSession(<%= sess.id %>)" class="text-blue-500 hover:underline">Leave Session</a>
+                <% } else { %>
+                    <% if (sess.playerNums === 0) { %>
+                        <p class="text-red-500">Fully Booked</p>
+                    <% } else { %>
+                        <a href="#" onclick="joinSession(<%= sess.id %>)" class="text-blue-500 hover:underline">Join Session</a>
+                    <% } %>
+                <% } %>
+            </div>
+            <% if (sess.userId === userId) { %>
+                <div class="mt-3 space-x-6">
+                    <a href="editSession/<%= sess.id %>" class="text-black-500 hover:text-blue-500">
+                        <svg style="display: inline;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                        </svg>
+                        Edit Session
+                    </a>
+                    <a href="cancel/<%= sess.id %>" class="text-black-500 hover:text-blue-500">
+                        <svg style="display: inline;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                        </svg>
+                        Cancel Session
+                    </a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</body>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="copyright" content="©Peddi Gopal">
+        <meta name="csrf-token" content="<%= csrfToken %>">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="/css/styles.css">
+        <title><%= title %></title>
+    </head>
+    <body class="bg-slate-300">
+        <div class="grid grid-cols-6">
+            <div class="col-start-3 col-span-2">
+                <%- include('header') %>
+                <div class="mt-4 space-x-6">
+                    <a href="/sport/selectedsession/<%= sess.id %>" class="text-blue-500 hover:underline">Go Back</a>
+                    <a href="/signout" class="text-blue-500 hover:underline">Signout</a>
+                </div>
+                <div class="mt-3">
+                    <h1 class="text-4xl mb-4"><%= title %></h1>
+                </div>
+                <form action="/cancel/<%= sess.id %>" method="post">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+                    <div class="flex gap-2 py-4">
+                        <div class="flex-auto">
+                            <input type="text" name="reason" placeholder="Give Reason for cancellation" class="border border-gray-300 rounded test-gray-900 w-full p-2 text-sm" required/>
+                        </div>
+                    </div>
+                    <div class="flex-none">
+                        <button class="bg-blue-600 text-white px-5 py-1.5 rounded font-medium mr-2 mb-2" type="submit">
+                            Cancel Session
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </body>
+</html>

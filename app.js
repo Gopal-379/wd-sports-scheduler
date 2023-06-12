@@ -227,6 +227,115 @@ app.get(
   }
 );
 
+app.get("/sport/selectedsession/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
+  //console.log(req.params.id);
+  const sess = await Session.findByPk(req.params.id);
+  //console.log(sess.playerNums);
+  const players = await participantSession.findAll({
+    where: {
+      sessionId: sess.id,
+    }
+  });
+  //console.log(players[0].id);
+  const userId = req.user.id;
+  //console.log(userId);
+  if (req.accepts("html")) {
+    try {
+      res.render("selectedSession", {
+        title: sess.sessionName,
+        sess,
+        players,
+        userId,
+        csrfToken: req.csrfToken(),
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  } else {
+    res.json({
+      players,
+      sess,
+    });
+  }
+});
+
+app.delete("/playersession/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
+  try {
+    const pr = await participantSession.findByPk(req.params.id);
+    const sess = await Session.findByPk(pr.sessionId);
+    console.log(pr.sessionId);
+    // await participantSession.destory({
+    //   where: {
+    //     playerId: req.params.id,
+    //   }
+    // });
+    await participantSession.remove(req.params.id);
+    await Session.increaseCount(sess);
+    return res.json({ success: true });
+  } catch (e) {
+    console.log(e);
+    return res.status(422).json(e);
+  }
+});
+
+app.post("/playersession/participant/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
+  const uid = req.user.id;
+  try {
+    const sess = await Session.findByPk(req.params.id);
+    await participantSession.create({
+      participants: `${req.user.firstname}`,
+      playerId: uid,
+      sessionId: req.params.id,
+    });
+    await Session.decreaseCount(sess);
+    return res.redirect(`/sport/selectedsession/${req.params.id}`);
+  } catch (err) {
+    console.log(err);
+    return res.status(422).json(err);
+  }
+});
+
+app.delete("/playersession/participant/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
+  try {
+    const sess = await Session.findByPk(req.params.id);
+    await participantSession.removeBysessionId(req.params.id, req.user.id);
+    await Session.increaseCount(sess);
+    return res.json({ success: true });
+  } catch (e) {
+    console.log(e);
+    return res.status(422).json(e);
+  }
+});
+
+app.get("/sport/selectedsession/cancel/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
+  const sess = await Session.findByPk(req.params.id);
+  const sid = await Sport.findByPk(Session.sportId);
+  try {
+    res.render("sessionCancel", {
+      title: "Session Cancel",
+      csrfToken: req.csrfToken(),
+      sess,
+      sid,
+    });
+  } catch (e) {
+    console.log(e);
+  }
+});
+
+app.post("/cancel/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
+  try {
+    const sess = await Session.findByPk(req.params.id);
+    await sess.update({
+      sessionCancelled: true,
+      reason: req.body.reason,
+    });
+    return res.redirect(`/sport/${sess.sportId}`);
+  } catch (e) {
+    console.log(e);
+    return res.status(422).json(e);
+  }
+})
+
 app.post(
   "/createsession/:id",
   connectEnsureLogin.ensureLoggedIn(),

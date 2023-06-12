@@ -59,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
       return this.findAll({
         where: {
           id: sessId,
-        }
+        },
       });
     }
 
@@ -79,10 +79,17 @@ module.exports = (sequelize, DataTypes) => {
       return this.destroy({
         where: {
           sportId,
-        }
+        },
       });
     }
 
+    static async increaseCount(sess) {
+      return sess.update({ playerNums: sess.playerNums + 1 });
+    }
+
+    static async decreaseCount(sess) {
+      return sess.update({ playerNums: sess.playerNums - 1 });
+    }
   }
   Session.init(
     {

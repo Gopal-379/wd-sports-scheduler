@@ -35,6 +35,23 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
+    static async remove(id) {
+      return this.destroy({
+        where: {
+          id,
+        }
+      });
+    }
+
+    static async removeBysessionId(sessionId, playerId) {
+      return this.destroy({
+        where: {
+          sessionId,
+          playerId,
+        }
+      })
+    }
+
   }
   participantSession.init({
     participants: DataTypes.STRING
