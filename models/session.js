@@ -38,6 +38,28 @@ module.exports = (sequelize, DataTypes) => {
         sportId,
       });
     }
+
+    static editSession({
+      sessid,
+      sessionName,
+      date,
+      time,
+      venue,
+      playerNums,
+      userId,
+      sportId,
+    }) {
+      return sessid.update({
+        sessionName,
+        date,
+        time,
+        venue,
+        playerNums,
+        userId,
+        sportId,
+      })
+    }
+
     static findPlayerSessionsById(userId, sportId) {
       return this.findAll({
         where: {

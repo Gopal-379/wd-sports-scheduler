@@ -362,6 +362,78 @@ app.post("/sport/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) => 
   }
 });
 
+app.get("/sport/selectedsession/editSession/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
+  const sess = await Session.findByPk(req.params.id);
+  const sport = await Sport.findByPk(sess.sportId);
+  try {
+    const participant = await participantSession.findAll({
+      where: {
+        sessionId: sess.id,
+      }
+    });
+    const map_playerName = participant.map((x) => x.participants);
+    const players = map_playerName.join(',');
+    res.render("editSession", {
+      title: "Edit Session",
+      csrfToken: req.csrfToken(),
+      sess,
+      players,
+      sport,
+    });
+  } catch (e) {
+    console.log(e);
+  }
+});
+
+app.post("/editsession/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
+  if (req.body.noplayers < 0) {
+    req.flash('error', "Number of players must be greater than zero");
+    return res.redirect(`/sport/selectedsesion/${req.params.id}`);
+  }
+  try {
+    const sess = await Session.findByPk(req.params.id);
+    const modifiedSession = await Session.editSession({
+      sessid: sess,
+      sessionName: req.body.sessionName,
+      date: req.body.date,
+      time: req.body.time,
+      venue: req.body.venue,
+      playerNums: req.body.noplayers,
+    });
+    const participant = await participantSession.findAll({
+      where: {
+        sessionId: sess.id,
+      },
+    });
+    await participantSession.deleteSession(req.params.id);
+    const playerNames = req.body.players.split(',');
+    for (let playerName of playerNames) {
+      let playerFound = false;
+      for (let player of participant) {
+        if (player.participants === playerName) {
+          await participantSession.create({
+            participants: playerName,
+            sessionId: modifiedSession.id,
+            playerId: player.playerId,
+          });
+          playerFound = true;
+          break;
+        }
+      }
+      if (!playerFound) {
+        await participantSession.create({
+          participants: playerName,
+          sessionId: modifiedSession.id,
+        });
+      }
+    }
+    return res.redirect(`/sport/selectedsession/${req.params.id}`);
+  } catch (e) {
+    console.log(e);
+    return res.status(422).json(e);
+  }
+});
+
 app.post(
   "/createsession/:id",
   connectEnsureLogin.ensureLoggedIn(),
