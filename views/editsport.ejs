@@ -12,25 +12,25 @@
     </head>
     <body class="bg-slate-300">
         <div class="grid grid-cols-6">
-            <div class="col-start-3 col-span-2">
-                <%- include('header') %>
-                <div class="mt-4 space-x-6">
-                    <a href="/sport/selectedsession/<%= sess.id %>" class="text-blue-500 hover:underline">Go Back</a>
+            <div class="col-start-2 col-span-4">
+                <%- include ('header') %>
+                 <div class="mt-4 space-x-6">
+                    <a href="/sport/<%= sid.id %>" class="text-blue-500 hover:underline">Go Back</a>
                     <a href="/signout" class="text-blue-500 hover:underline">Signout</a>
                 </div>
                 <div class="mt-3">
                     <h1 class="text-4xl mb-4"><%= title %></h1>
                 </div>
-                <form action="/cancel/<%= sess.id %>" method="post">
+                <form action="/sport/<%= sid.id %>" method="post">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
                     <div class="flex py-4">
                         <div class="flex-auto">
-                            <input type="text" name="reason" placeholder="Give Reason for cancellation" class="border border-gray-300 rounded test-gray-900 w-full p-2 text-sm" required/>
+                            <input type="text" name="sportname" placeholder="New name for sport" class="border border-gray-300 rounded test-gray-900 w-full p-2 text-sm" required/>
                         </div>
                     </div>
                     <div class="flex-none">
                         <button class="bg-blue-600 text-white px-5 py-1.5 rounded font-medium mr-2 mb-2" type="submit">
-                            Cancel Session
+                            Edit
                         </button>
                     </div>
                 </form>

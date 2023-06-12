@@ -43,7 +43,7 @@
                 <h1 class="text-4xl mb-4"><%= title %></h1>
                 <% if (role === "admin") { %>
                     <div class="mt-4 space-x-6">
-                        <a href="#" class="text-white bg-blue-500 hover:bg-blue-600 rounded px-5 py-2">EditSport</a>
+                        <a href="edit/<%= sport.id %>" class="text-white bg-blue-500 hover:bg-blue-600 rounded px-5 py-2">EditSport</a>
                         <a href="#" class="text-white bg-blue-500 hover:bg-blue-600 rounded px-5 py-2" onclick="deleteSport(<%= sport.id %>)">DeleteSport</a>
                     </div>
                 <% } %>

@@ -334,7 +334,33 @@ app.post("/cancel/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) =>
     console.log(e);
     return res.status(422).json(e);
   }
-})
+});
+
+app.get("/sport/edit/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
+  const sid = await Sport.findByPk(req.params.id);
+  try {
+    res.render("editsport", {
+      title: "Edit Sport",
+      csrfToken: req.csrfToken(),
+      sid,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.post("/sport/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
+  const sid = await Sport.findByPk(req.params.id);
+  try {
+    await sid.update({
+      sportName: req.body.sportname,
+    });
+    return res.redirect(`/sport/${req.params.id}`);
+  } catch (e) {
+    console.log(e);
+    return res.status(422).json(e);
+  }
+});
 
 app.post(
   "/createsession/:id",
