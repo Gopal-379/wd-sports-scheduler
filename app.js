@@ -434,6 +434,28 @@ app.post("/editsession/:id", connectEnsureLogin.ensureLoggedIn(), async (req, re
   }
 });
 
+app.get("/sport/previoussession/:id", connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
+  const sid = await Sport.findByPk(req.params.id);
+  const all = await Session.findSportById(req.params.id);
+  const prev = await Session.filterPreviousSessions(all);
+  if (req.accepts("html")) {
+    try {
+      res.render("previousSessions", {
+        title: "Previous Sessions",
+        csrfToken: req.csrfToken(),
+        sid,
+        prev,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  } else {
+    res.json({
+      prev,
+    });
+  }
+});
+
 app.post(
   "/createsession/:id",
   connectEnsureLogin.ensureLoggedIn(),

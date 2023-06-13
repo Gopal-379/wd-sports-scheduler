@@ -57,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
         playerNums,
         userId,
         sportId,
-      })
+      });
     }
 
     static findPlayerSessionsById(userId, sportId) {
@@ -91,6 +91,14 @@ module.exports = (sequelize, DataTypes) => {
         (s) => new Date(`${s.date} ${s.time}`) >= curr
       );
       return upComing;
+    }
+
+    static async filterPreviousSessions(sportSessions) {
+      const curr = new Date();
+      const prev = sportSessions.filter(
+        (s) => new Date(`${s.date} ${s.time}`) < curr
+      );
+      return prev;
     }
 
     static async getUncancelledSessionsFilteredByCancellationStatus(sessions) {
