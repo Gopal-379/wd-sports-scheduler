@@ -45,7 +45,7 @@ describe("Sports Scheduler", function () {
       firstName: "John",
       lastName: "Smith",
       email: "john@smith.com",
-      password: "123456789",
+      password: "1234567891",
       submit: "admin",
       _csrf: csrfToken,
     });
@@ -59,7 +59,7 @@ describe("Sports Scheduler", function () {
       firstName: "James",
       lastName: "Doe",
       email: "james@doe.com",
-      password: "123456789",
+      password: "1234567891",
       submit: "player",
       _csrf: csrfToken,
     });
