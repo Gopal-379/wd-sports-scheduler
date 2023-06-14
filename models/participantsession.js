@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class participantSession extends Model {
     /**
@@ -23,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       return this.findAll({
         where: {
           playerId,
-        }
+        },
       });
     }
 
@@ -31,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
       return this.destroy({
         where: {
           sessionId,
-        }
+        },
       });
     }
 
@@ -39,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
       return this.destroy({
         where: {
           id,
-        }
+        },
       });
     }
 
@@ -48,16 +46,18 @@ module.exports = (sequelize, DataTypes) => {
         where: {
           sessionId,
           playerId,
-        }
-      })
+        },
+      });
     }
-
   }
-  participantSession.init({
-    participants: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'participantSession',
-  });
+  participantSession.init(
+    {
+      participants: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: "participantSession",
+    }
+  );
   return participantSession;
 };

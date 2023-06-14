@@ -1,46 +1,46 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Sessions', {
+    await queryInterface.createTable("Sessions", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       date: {
-        type: Sequelize.DATEONLY
+        type: Sequelize.DATEONLY,
       },
       time: {
-        type: Sequelize.TIME
+        type: Sequelize.TIME,
       },
       venue: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       playerNums: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       sessionName: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       sessionCancelled: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
       },
       reason: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Sessions');
-  }
+    await queryInterface.dropTable("Sessions");
+  },
 };
